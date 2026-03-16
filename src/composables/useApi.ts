@@ -23,10 +23,14 @@ const request = async <T>(path: string, options: RequestInit = {}) => {
     headers['Authorization'] = `Bearer ${token}`
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers })
+  const url = `${BASE_URL}${path}`
+  console.log('API request:', url, options.method || 'GET', 'token:', !!token)
+  const res = await fetch(url, { ...options, headers })
+  console.log('API response status:', res.status)
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
+    console.error('API error:', data)
     throw new Error(
       (data as { message?: string }).message || `Erreur ${res.status}`,
     )

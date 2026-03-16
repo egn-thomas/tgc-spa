@@ -6,6 +6,7 @@
     <NSpace justify="space-between" align="center" style="height: 56px">
       <NSpace align="center" :size="16">
         <RouterLink to="/">TCG SPA</RouterLink>
+        <NButton size="small" @click="goToCreateDeck">Créer un deck</NButton>
         <NButton
           tag="a"
           :href="`${apiBaseUrl.replace('/api', '')}/api-docs`"
@@ -46,5 +47,10 @@ const authStore = useAuthStore()
 const handleLogout = () => {
   authStore.logout()
   router.push(ROUTES.SIGN_IN)
+}
+
+const goToCreateDeck = () => {
+  console.log('Navigating to create deck from header')
+  router.push(ROUTES.DECK_CREATE)
 }
 </script>
