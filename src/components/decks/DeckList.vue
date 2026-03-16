@@ -10,7 +10,7 @@
       :data="decks"
       :loading="loading"
       :pagination="false"
-      :row-key="(row: { id: BigInteger }) => row.id"
+      :row-key="(row: Deck) => row.id"
     >
     </NDataTable>
 
@@ -26,7 +26,7 @@ import { h, onActivated, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useApi } from '@/composables/useApi'
-import type { Deck } from '@/types'
+import type { Card, Deck } from '@/types'
 
 const router = useRouter()
 const message = useMessage()
@@ -34,11 +34,18 @@ const api = useApi()
 
 const loading = ref(false)
 const decks = ref<Deck[]>([])
+const cards = ref<Card[]>([])
 
 const loadDecks = async () => {
   loading.value = true
+
   try {
-    decks.value = await api.getMyDecks()
+    const [myDecks, allCards] = await Promise.all([
+      api.getMyDecks(),
+      api.getCards(),
+    ])
+    decks.value = myDecks
+    cards.value = allCards
   } catch (error) {
     if (error instanceof Error) {
       message.error(error.message)
@@ -46,6 +53,11 @@ const loadDecks = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const getDeckCards = (deck: Deck) => {
+  const cardIds = new Set(deck.cards.map((c) => c.cardId))
+  return cards.value.filter((card) => cardIds.has(card.id))
 }
 
 const handleDelete = async (deckId: number) => {
@@ -77,8 +89,22 @@ const columns: DataTableColumn<Deck>[] = [
   },
   {
     title: 'Cartes',
-    key: 'cardsCount',
-    render: (row: Deck) => String(row.cards.length),
+    key: 'cards',
+    render: (row: Deck) =>
+      h(
+        'div',
+        { class: 'deck-cards' },
+        getDeckCards(row).map((card) =>
+          h('img', {
+            key: card.id,
+            src: card.imgUrl,
+            alt: card.name,
+            title: card.name,
+            class: 'deck-card-thumb',
+            style: 'width: 40px; height: 40px; object-fit: contain;',
+          }),
+        ),
+      ),
   },
   {
     title: 'Actions',
@@ -118,3 +144,23 @@ const columns: DataTableColumn<Deck>[] = [
 onMounted(loadDecks)
 onActivated(loadDecks)
 </script>
+
+<style scoped>
+.deck-cards {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  max-width: 260px;
+  max-height: 68px;
+  overflow: hidden;
+}
+.deck-card-thumb {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+</style>
