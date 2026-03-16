@@ -93,16 +93,6 @@ const currentHpColor = computed(() => {
 const currentHp = computed(() => props.currentHp)
 
 const handleClick = () => {
-  console.log(
-    'Card clicked:',
-    props.card.id,
-    'disabled:',
-    isDisabled.value,
-    'selectable prop:',
-    props.selectable,
-    'typeof selectable:',
-    typeof props.selectable,
-  )
   if (isDisabled.value || props.selectable === false) return
   emits('click')
 }
@@ -115,6 +105,7 @@ const handleClick = () => {
     transform 160ms ease,
     box-shadow 160ms ease;
   user-select: none;
+  border-radius: 8px;
 }
 
 .card-item--sm {
@@ -126,8 +117,9 @@ const handleClick = () => {
 }
 
 .card-item--selected {
-  border-color: var(--n-color-primary);
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  border-color: #52c41a;
+  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
+  background-color: rgba(82, 196, 26, 0.05);
   transform: translateY(-2px);
 }
 

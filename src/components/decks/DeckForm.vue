@@ -10,7 +10,7 @@
           <NText>
             {{ selectedIds.length }} / {{ maxCards }}
             <span v-if="selectedIds.length !== maxCards"
-              >(doit être exactement {{ maxCards }})</span
+              >doit être exactement {{ maxCards }}</span
             >
           </NText>
           <NButton
@@ -22,6 +22,15 @@
             Tout désélectionner
           </NButton>
         </NSpace>
+      </NFormItem>
+
+      <NFormItem label="Rechercher une carte">
+        <NInput
+          v-model:value="searchQuery"
+          placeholder="Rechercher par nom, type ou numéro"
+          clearable
+          show-count
+        />
       </NFormItem>
 
       <NFormItem>
@@ -38,7 +47,7 @@
 
       <CardGrid
         v-model:model-value="selectedIds"
-        :cards="cards"
+        :cards="filteredCards"
         :max-selection="maxCards"
         :size="cardSize"
         :selectable="true"
@@ -88,6 +97,19 @@ const rules = {
 }
 
 const cards = ref<Card[]>(props.cards ?? [])
+const searchQuery = ref('')
+
+const filteredCards = computed(() => {
+  const term = searchQuery.value.trim().toLowerCase()
+  if (!term) return cards.value
+  return cards.value.filter((card) => {
+    return (
+      card.name.toLowerCase().includes(term) ||
+      card.type.toLowerCase().includes(term) ||
+      String(card.pokedexNumber).includes(term)
+    )
+  })
+})
 
 const canSubmit = computed(
   () => !!form.value.name.trim() && selectedIds.value.length === maxCards.value,
@@ -96,12 +118,9 @@ const canSubmit = computed(
 const loadCards = async () => {
   if (cards.value.length) return
   try {
-    console.log('Loading cards...')
     cards.value = await api.getCards()
-    console.log('Cards loaded:', cards.value.length)
     emits('loaded', cards.value)
   } catch (error) {
-    console.error('Error loading cards:', error)
     if (error instanceof Error) message.error(error.message)
   }
 }
@@ -135,8 +154,4 @@ watch(
     if (next !== undefined) form.value.name = next
   },
 )
-
-watch(selectedIds, (newIds) => {
-  console.log('Selected IDs changed:', newIds)
-})
 </script>

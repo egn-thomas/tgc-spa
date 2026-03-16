@@ -10,7 +10,7 @@
       :data="decks"
       :loading="loading"
       :pagination="false"
-      :row-key="(row) => row.id"
+      :row-key="(row: { id: BigInteger }) => row.id"
     >
     </NDataTable>
 
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NSpace, useMessage } from 'naive-ui'
+import { type DataTableColumn, NButton, NSpace, useMessage } from 'naive-ui'
 import { h, onActivated, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -37,12 +37,9 @@ const decks = ref<Deck[]>([])
 
 const loadDecks = async () => {
   loading.value = true
-  console.log('Loading decks...')
   try {
     decks.value = await api.getMyDecks()
-    console.log('Decks loaded:', decks.value.length)
   } catch (error) {
-    console.error('Error loading decks:', error)
     if (error instanceof Error) {
       message.error(error.message)
     }
@@ -67,11 +64,13 @@ const handleDelete = async (deckId: number) => {
 }
 
 const createDeck = () => {
-  console.log('Navigating to create deck')
   router.push('/decks/new')
 }
 
-const columns = [
+const viewDeck = (id: number) => router.push(`/decks/${id}`)
+const editDeck = (id: number) => router.push(`/decks/${id}/edit`)
+
+const columns: DataTableColumn<Deck>[] = [
   {
     title: 'Nom',
     key: 'name',
@@ -115,9 +114,6 @@ const columns = [
       ),
   },
 ]
-
-const viewDeck = (id: number) => router.push(`/decks/${id}`)
-const editDeck = (id: number) => router.push(`/decks/${id}/edit`)
 
 onMounted(loadDecks)
 onActivated(loadDecks)

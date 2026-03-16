@@ -52,21 +52,17 @@ const deckId = computed(() => route.params.id?.toString() ?? '')
 
 const loadDeck = async () => {
   loading.value = true
-  console.log('Loading deck:', deckId.value)
   try {
     const [fetchedDeck, allCards] = await Promise.all([
       api.getDeck(deckId.value),
       api.getCards(),
     ])
 
-    console.log('Fetched deck:', fetchedDeck)
     deck.value = fetchedDeck
 
     const cardIds = new Set(fetchedDeck.cards.map((c) => c.cardId))
     cards.value = allCards.filter((card) => cardIds.has(card.id))
-    console.log('Filtered cards:', cards.value.length)
   } catch (error) {
-    console.error('Error loading deck:', error)
     if (error instanceof Error) message.error(error.message)
   } finally {
     loading.value = false

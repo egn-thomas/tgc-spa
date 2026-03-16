@@ -42,7 +42,6 @@ const selectionCount = computed(() => selectedSet.value.size)
 
 const selectable = computed(() => {
   const val = props.selectable ?? true
-  console.log('CardGrid selectable:', val)
   return val
 })
 const size = computed(() => props.size ?? 'md')
@@ -55,7 +54,6 @@ const isCardDisabled = (card: Card) => {
 }
 
 const toggleSelection = (cardId: number) => {
-  console.log('Toggling selection for card:', cardId)
   const selected = new Set(selectedSet.value)
   if (selected.has(cardId)) {
     selected.delete(cardId)

@@ -1,17 +1,24 @@
 <template>
-  <div class="container">
-    <DeckForm
-      title="Créer un nouveau deck"
-      submit-label="Créer"
-      :submitting="loading"
-      @submit="handleSubmit"
-    />
+  <div class="page">
+    <div class="page__header">
+      <NButton text class="page__back" @click="router.back()"> Retour </NButton>
+      <NText class="page__title" h2> Créer un deck </NText>
+    </div>
+
+    <div class="page__content">
+      <DeckForm
+        title="Créer un nouveau deck"
+        submit-label="Créer"
+        :submitting="loading"
+        @submit="handleSubmit"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useMessage } from 'naive-ui'
-import { onMounted, ref } from 'vue'
+import { NButton, NText, useMessage } from 'naive-ui'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import DeckForm from '@/components/decks/DeckForm.vue'
@@ -33,7 +40,6 @@ const handleSubmit = async ({
   loading.value = true
   try {
     const deck = await api.createDeck({ name, cards })
-    console.log('Deck created:', deck)
     message.success('Deck créé avec succès.')
     router.push(`/decks/${deck.id}`)
   } catch (error) {
@@ -42,8 +48,34 @@ const handleSubmit = async ({
     loading.value = false
   }
 }
-
-onMounted(() => {
-  console.log('DeckCreatePage mounted')
-})
 </script>
+
+<style scoped>
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.page__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page__back {
+  min-width: 100px;
+}
+
+.page__title {
+  flex: 1;
+}
+
+.page__content {
+  background: #f6f8fa;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+</style>

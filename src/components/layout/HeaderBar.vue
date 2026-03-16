@@ -50,7 +50,6 @@ const handleLogout = () => {
 }
 
 const goToCreateDeck = () => {
-  console.log('Navigating to create deck from header')
   router.push(ROUTES.DECK_CREATE)
 }
 </script>
