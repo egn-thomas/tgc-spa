@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import DeckCreatePage from './pages/DeckCreatePage.vue'
+import DeckDetailPage from './pages/DeckDetailPage.vue'
+import DeckEditPage from './pages/DeckEditPage.vue'
 import HomePage from './pages/HomePage.vue'
 import SignInPage from './pages/SignInPage.vue'
 import SignUpPage from './pages/SignUpPage.vue'
@@ -9,12 +12,38 @@ export const ROUTES = {
   HOME: '/',
   SIGN_IN: '/sign-in',
   SIGN_UP: '/sign-up',
+  DECK_CREATE: '/decks/new',
+  DECK_DETAIL: (id: string | number) => `/decks/${id}`,
+  DECK_EDIT: (id: string | number) => `/decks/${id}/edit`,
 } as const
 
 const routes = [
   { path: ROUTES.HOME, component: HomePage, meta: { requiresAuth: true } },
-  { path: ROUTES.SIGN_IN, component: SignInPage, meta: { requiresGuest: true } },
-  { path: ROUTES.SIGN_UP, component: SignUpPage, meta: { requiresGuest: true } },
+  {
+    path: ROUTES.SIGN_IN,
+    component: SignInPage,
+    meta: { requiresGuest: true },
+  },
+  {
+    path: ROUTES.SIGN_UP,
+    component: SignUpPage,
+    meta: { requiresGuest: true },
+  },
+  {
+    path: ROUTES.DECK_CREATE,
+    component: DeckCreatePage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/decks/:id',
+    component: DeckDetailPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/decks/:id/edit',
+    component: DeckEditPage,
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
