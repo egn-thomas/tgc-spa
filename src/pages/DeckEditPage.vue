@@ -1,10 +1,13 @@
 <template>
-  <div class="container">
-    <div v-if="loading">
+  <div class="page">
+    <div
+      v-if="loading"
+      style="display: flex; justify-content: center; padding: 40px 0"
+    >
       <NSpin />
     </div>
 
-    <div v-else-if="deck">
+    <div v-else-if="deck" class="page__content">
       <DeckForm
         title="Modifier le deck"
         submit-label="Enregistrer"
@@ -16,14 +19,14 @@
       />
     </div>
 
-    <div v-else>
+    <div v-else style="display: flex; justify-content: center">
       <NEmpty description="Deck introuvable" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useMessage } from 'naive-ui'
+import { NEmpty, NSpin, useMessage } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -93,3 +96,26 @@ const handleSubmit = async ({
 
 onMounted(loadDeck)
 </script>
+
+<style scoped>
+.page {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+}
+
+.page__content {
+  background: #f6f8fa;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+</style>

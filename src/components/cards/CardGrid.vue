@@ -1,24 +1,25 @@
 <template>
-  <div class="card-grid">
-    <CardItem
-      v-for="card in cards"
-      :key="card.id"
-      :card="card"
-      :size="size"
-      :selectable="selectable"
-      :selected="selectedSet.has(card.id)"
-      :disabled="isCardDisabled(card)"
-      :current-hp="currentHpMap?.[card.id]"
-      @click="toggleSelection(card.id)"
-    />
-    <div v-if="cards.length === 0" class="card-grid__empty">
+  <NGrid responsive="screen" cols="1 s:2 m:3 l:4" :x-gap="16" :y-gap="16">
+    <NGridItem v-for="card in cards" :key="card.id">
+      <CardItem
+        :card="card"
+        :size="size"
+        :selectable="selectable"
+        :selected="selectedSet.has(card.id)"
+        :disabled="isCardDisabled(card)"
+        :current-hp="currentHpMap?.[card.id]"
+        @click="toggleSelection(card.id)"
+      />
+    </NGridItem>
+    <NGridItem v-if="cards.length === 0" class="card-grid__empty">
       <NEmpty description="Aucune carte disponible" />
-    </div>
-  </div>
+    </NGridItem>
+  </NGrid>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { NGrid, NGridItem, NEmpty } from 'naive-ui'
 
 import type { Card } from '@/types'
 
@@ -66,17 +67,10 @@ const toggleSelection = (cardId: number) => {
 </script>
 
 <style scoped>
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  align-items: start;
-}
-
 .card-grid__empty {
-  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   padding: 40px 0;
+  grid-column: 1 / -1;
 }
 </style>

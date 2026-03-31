@@ -1,8 +1,14 @@
 <template>
-  <NSpace vertical :size="16" style="width: 100%; padding: 16px 0">
-    <OpponentZone />
-    <ActionBar />
-    <PlayerZone />
+  <NSpace vertical :size="12" style="width: 100%; padding: 8px 0">
+    <div class="game-zone">
+      <OpponentZone />
+    </div>
+    <div class="action-zone">
+      <ActionBar />
+    </div>
+    <div class="player-zone">
+      <PlayerZone />
+    </div>
     <GameEndModal v-if="gameStore.gameResult" />
   </NSpace>
 </template>
@@ -24,4 +30,18 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.game-zone,
+.action-zone,
+.player-zone {
+  padding: 0 12px;
+}
+
+@media (min-width: 768px) {
+  .game-zone,
+  .action-zone,
+  .player-zone {
+    padding: 0;
+  }
+}
+</style>

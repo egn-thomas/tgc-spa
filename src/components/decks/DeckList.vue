@@ -5,23 +5,76 @@
       <NButton type="primary" @click="createDeck">Créer un deck</NButton>
     </NSpace>
 
-    <NDataTable
-      :columns="columns"
-      :data="decks"
-      :loading="loading"
-      :pagination="false"
-      :row-key="(row: Deck) => row.id"
+    <div
+      v-if="loading"
+      style="display: flex; justify-content: center; padding: 40px 0"
     >
-    </NDataTable>
+      <NSpin />
+    </div>
 
-    <div v-if="!loading && decks.length === 0">
+    <NGrid
+      v-else-if="decks.length > 0"
+      responsive="screen"
+      cols="1 s:2 m:2 l:3"
+      :x-gap="24"
+      :y-gap="24"
+    >
+      <NGridItem v-for="deck in decks" :key="deck.id">
+        <NCard :title="deck.name" segmented size="small" hoverable>
+          <template #header-extra>
+            <NDropdown :options="getDeckActions(deck.id)">
+              <NButton text>⋮</NButton>
+            </NDropdown>
+          </template>
+
+          <NSpace vertical :size="12" style="width: 100%">
+            <div>
+              <NText strong>{{ deck.cards.length }} cartes</NText>
+            </div>
+            <div class="deck-card-grid">
+              <img
+                v-for="card in getDeckCards(deck)"
+                :key="card.id"
+                :src="card.imgUrl"
+                :alt="card.name"
+                :title="card.name"
+                class="deck-card-thumb"
+              />
+            </div>
+
+            <NSpace horizontal :size="8" style="width: 100%; margin-top: 12px">
+              <NButton size="small" type="primary" @click="viewDeck(deck.id)">
+                Voir
+              </NButton>
+              <NButton size="small" @click="editDeck(deck.id)">
+                Modifier
+              </NButton>
+            </NSpace>
+          </NSpace>
+        </NCard>
+      </NGridItem>
+    </NGrid>
+
+    <div v-else style="display: flex; justify-content: center">
       <NEmpty description="Vous n'avez encore aucun deck. Créez-en un !" />
     </div>
   </NSpace>
 </template>
 
 <script setup lang="ts">
-import { type DataTableColumn, NButton, NSpace, useMessage } from 'naive-ui'
+import {
+  NButton,
+  NCard,
+  NGrid,
+  NGridItem,
+  NSpace,
+  NSpin,
+  useMessage,
+  NDropdown,
+  NText,
+  NEmpty,
+  type DropdownOption,
+} from 'naive-ui'
 import { h, onActivated, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -57,8 +110,36 @@ const loadDecks = async () => {
 
 const getDeckCards = (deck: Deck) => {
   const cardIds = new Set(deck.cards.map((c) => c.cardId))
-  return cards.value.filter((card) => cardIds.has(card.id))
+  return cards.value.filter((card) => cardIds.has(card.id)).slice(0, 5)
 }
+
+const getDeckActions = (deckId: number): DropdownOption[] => [
+  {
+    label: 'Voir',
+    key: 'view',
+    props: {
+      onClick: () => viewDeck(deckId),
+    },
+  },
+  {
+    label: 'Modifier',
+    key: 'edit',
+    props: {
+      onClick: () => editDeck(deckId),
+    },
+  },
+  {
+    type: 'divider',
+    key: 'd1',
+  },
+  {
+    label: 'Supprimer',
+    key: 'delete',
+    props: {
+      onClick: () => handleDelete(deckId),
+    },
+  },
+]
 
 const handleDelete = async (deckId: number) => {
   const confirmed = window.confirm(
@@ -82,85 +163,21 @@ const createDeck = () => {
 const viewDeck = (id: number) => router.push(`/decks/${id}`)
 const editDeck = (id: number) => router.push(`/decks/${id}/edit`)
 
-const columns: DataTableColumn<Deck>[] = [
-  {
-    title: 'Nom',
-    key: 'name',
-  },
-  {
-    title: 'Cartes',
-    key: 'cards',
-    render: (row: Deck) =>
-      h(
-        'div',
-        { class: 'deck-cards' },
-        getDeckCards(row).map((card) =>
-          h('img', {
-            key: card.id,
-            src: card.imgUrl,
-            alt: card.name,
-            title: card.name,
-            class: 'deck-card-thumb',
-            style: 'width: 40px; height: 40px; object-fit: contain;',
-          }),
-        ),
-      ),
-  },
-  {
-    title: 'Actions',
-    key: 'actions',
-    render: (row: Deck) =>
-      h(
-        NSpace,
-        {},
-        {
-          default: () => [
-            h(
-              NButton,
-              { size: 'small', text: true, onClick: () => viewDeck(row.id) },
-              { default: () => 'Voir' },
-            ),
-            h(
-              NButton,
-              { size: 'small', text: true, onClick: () => editDeck(row.id) },
-              { default: () => 'Modifier' },
-            ),
-            h(
-              NButton,
-              {
-                size: 'small',
-                text: true,
-                type: 'error',
-                onClick: () => handleDelete(row.id),
-              },
-              { default: () => 'Supprimer' },
-            ),
-          ],
-        },
-      ),
-  },
-]
-
 onMounted(loadDecks)
 onActivated(loadDecks)
 </script>
 
 <style scoped>
-.deck-cards {
+.deck-card-grid {
   display: flex;
-  gap: 6px;
   flex-wrap: wrap;
-  align-items: center;
-  max-width: 260px;
-  max-height: 68px;
-  overflow: hidden;
+  gap: 8px;
 }
+
 .deck-card-thumb {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  border-radius: 6px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
 }
 </style>

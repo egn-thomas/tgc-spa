@@ -1,7 +1,11 @@
 <template>
-  <div class="container">
+  <div class="page">
     <NSpace vertical :size="24" style="width: 100%">
-      <NSpace justify="space-between" align="center" style="width: 100%">
+      <NSpace
+        justify="space-between"
+        align="center"
+        style="width: 100%; flex-wrap: wrap"
+      >
         <NText h2>Deck : {{ deck?.name ?? '...' }}</NText>
         <NSpace>
           <NButton
@@ -15,7 +19,10 @@
         </NSpace>
       </NSpace>
 
-      <div v-if="loading">
+      <div
+        v-if="loading"
+        style="display: flex; justify-content: center; padding: 40px 0"
+      >
         <NSpin />
       </div>
 
@@ -23,7 +30,7 @@
         <CardGrid :cards="cards" :selectable="false" :size="'md'" />
       </div>
 
-      <div v-else>
+      <div v-else style="display: flex; justify-content: center">
         <NEmpty description="Deck introuvable" />
       </div>
     </NSpace>
@@ -31,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { useMessage } from 'naive-ui'
+import { useMessage, NSpin, NEmpty } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -76,3 +83,19 @@ const goToEdit = () => {
 
 onMounted(loadDeck)
 </script>
+
+<style scoped>
+.page {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 0;
+  }
+}
+</style>

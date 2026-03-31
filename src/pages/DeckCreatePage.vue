@@ -52,9 +52,16 @@ const handleSubmit = async ({
 
 <style scoped>
 .page {
-  max-width: 980px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 24px 0;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 980px;
+    padding: 24px 0;
+  }
 }
 
 .page__header {

@@ -1,50 +1,59 @@
 <template>
-  <NCard :title="title">
-    <NForm ref="formRef" :model="form" :rules="rules">
-      <NFormItem label="Nom du deck" path="name">
-        <NInput v-model:value="form.name" placeholder="Ex: Flammes du désert" />
-      </NFormItem>
+  <NGrid responsive="screen" cols="1" :x-gap="16">
+    <NGridItem span="1 m:2" offset="0 m:1">
+      <NCard :title="title">
+        <NForm ref="formRef" :model="form" :rules="rules">
+          <NFormItem label="Nom du deck" path="name">
+            <NInput
+              v-model:value="form.name"
+              placeholder="Ex: Flammes du désert"
+            />
+          </NFormItem>
 
-      <NFormItem label="Cartes sélectionnées">
-        <NSpace align="center" justify="space-between" style="width: 100%">
-          <NText>
-            {{ selectedIds.length }} / {{ maxCards }}
-            <span v-if="selectedIds.length !== maxCards"
-              >doit être exactement {{ maxCards }}</span
+          <NFormItem label="Cartes sélectionnées">
+            <NSpace align="center" justify="space-between" style="width: 100%">
+              <NText>
+                {{ selectedIds.length }} / {{ maxCards }}
+                <span v-if="selectedIds.length !== maxCards"
+                  >doit être exactement {{ maxCards }}</span
+                >
+              </NText>
+              <NButton
+                v-if="selectedIds.length"
+                size="small"
+                text
+                @click="clearSelection"
+              >
+                Tout désélectionner
+              </NButton>
+            </NSpace>
+          </NFormItem>
+
+          <NFormItem label="Rechercher une carte">
+            <NInput
+              v-model:value="searchQuery"
+              placeholder="Rechercher par nom, type ou numéro"
+              clearable
+              show-count
+            />
+          </NFormItem>
+
+          <NFormItem>
+            <NButton
+              type="primary"
+              :disabled="!canSubmit"
+              :loading="submitting"
+              block
+              @click="submit"
             >
-          </NText>
-          <NButton
-            v-if="selectedIds.length"
-            size="small"
-            text
-            @click="clearSelection"
-          >
-            Tout désélectionner
-          </NButton>
-        </NSpace>
-      </NFormItem>
+              {{ submitLabel }}
+            </NButton>
+          </NFormItem>
+        </NForm>
+      </NCard>
+    </NGridItem>
 
-      <NFormItem label="Rechercher une carte">
-        <NInput
-          v-model:value="searchQuery"
-          placeholder="Rechercher par nom, type ou numéro"
-          clearable
-          show-count
-        />
-      </NFormItem>
-
-      <NFormItem>
-        <NButton
-          type="primary"
-          :disabled="!canSubmit"
-          :loading="submitting"
-          block
-          @click="submit"
-        >
-          {{ submitLabel }}
-        </NButton>
-      </NFormItem>
-
+    <NGridItem span="1">
       <CardGrid
         v-model:model-value="selectedIds"
         :cards="filteredCards"
@@ -52,12 +61,12 @@
         :size="cardSize"
         :selectable="true"
       />
-    </NForm>
-  </NCard>
+    </NGridItem>
+  </NGrid>
 </template>
 
 <script setup lang="ts">
-import { type FormInst, useMessage } from 'naive-ui'
+import { type FormInst, useMessage, NGrid, NGridItem } from 'naive-ui'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import CardGrid from '@/components/cards/CardGrid.vue'
